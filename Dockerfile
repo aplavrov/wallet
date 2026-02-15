@@ -16,6 +16,7 @@ WORKDIR /app
 COPY --from=builder /app/wallet .
 
 COPY config.env .
+COPY internal/storage/db/migrations ./internal/storage/db/migrations
 
 EXPOSE 9000
 

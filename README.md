@@ -10,15 +10,13 @@
 
 ## Запуск приложения
 
-### 1. Поднять систему
-
 ```bash
 docker-compose up --build
 ````
 
 Будут запущены:
 
-* postgres — основная база данных
+* postgres — основная база данных (миграция применяется в коде)
 * postgres-test — база для интеграционных тестов
 * app — приложение
 
@@ -27,24 +25,6 @@ docker-compose up --build
 ```
 http://localhost:9000
 ```
-
----
-
-### 2. Применить миграции
-
-Перед первым запуском необходимо применить миграции к основной базе:
-
-```bash
-make migration-up
-```
-
-Для тестовой базы:
-
-```bash
-make test-migration-up
-```
-
----
 
 ## API
 
@@ -62,45 +42,47 @@ make test-migration-up
 }
 ```
 
-Возможные значения `operationType`:
-
-* DEPOSIT
-* WITHDRAW
-
----
+Возможные значения `operationType` это "DEPOSIT" или "WITHDRAW".
 
 ### GET /api/v1/wallets/{walletId}
 
 Получение текущего баланса кошелька.
 
----
+### POST /api/v1/wallets
+
+Создает кошелек и возвращает его UUID, добавлено для удобства тестирования.
 
 ## Тестирование
 
 ### Unit-тесты
-
+Запускаются через Makefile:
 ```bash
 make test-unit
 ```
 
----
-
 ### Интеграционные тесты
-
-1. Убедиться, что запущена тестовая база:
-
-```bash
-docker-compose up -d postgres-test
-```
-
-2. Применить миграции:
-
+Сначала необходимо применить миграции, затем запустить через Makefile:
 ```bash
 make test-migration-up
+make test-integration
 ```
 
-3. Запустить тесты:
+### Ручное тестирование
+Примеры curl-запросов:
 
+Создание кошелька
 ```bash
-make test-integration
+curl -X POST http://localhost:9000/api/v1/wallets
+```
+Пополнение кошелька
+```bash
+curl -X POST http://localhost:9000/api/v1/wallet -H "Content-Type: application/json" -d '{"walletId": "11111111-1111-1111-1111-111111111111", "operationType": "DEPOSIT", "amount": 1000}'
+```
+Снятие с кошелька
+```bash
+curl -X POST http://localhost:9000/api/v1/wallet -H "Content-Type: application/json" -d '{"walletId": "11111111-1111-1111-1111-111111111111", "operationType": "WITHDRAW", "amount": 100}'
+```
+Баланс кошелька
+```bash
+curl -X GET http://localhost:9000/api/v1/wallets/11111111-1111-1111-1111-111111111111
 ```
