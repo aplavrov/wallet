@@ -15,6 +15,8 @@ WORKDIR /app
 
 COPY --from=builder /app/wallet .
 
-EXPOSE 8080
+COPY config.env .
+
+EXPOSE 9000
 
 CMD ["./wallet"]

@@ -14,7 +14,7 @@ func NewDB(ctx context.Context) (*Database, error) {
 		return nil, err
 	}
 
-	pool, err := pgxpool.Connect(ctx, generateDsn())
+	pool, err := pgxpool.Connect(ctx, GenerateDsn())
 	if err != nil {
 		return nil, err
 	}
@@ -22,7 +22,7 @@ func NewDB(ctx context.Context) (*Database, error) {
 	return NewDatabase(pool), nil
 }
 
-func generateDsn() string {
+func GenerateDsn() string {
 	host := os.Getenv("DB_HOST")
 	port := os.Getenv("DB_PORT")
 	user := os.Getenv("DB_USER")

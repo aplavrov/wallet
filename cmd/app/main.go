@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"database/sql"
 	"log"
 	"os"
 	"os/signal"
@@ -11,6 +12,8 @@ import (
 	"github.com/aplavrov/wallet/internal/service"
 	"github.com/aplavrov/wallet/internal/storage/db"
 	"github.com/aplavrov/wallet/internal/storage/postgresql"
+	_ "github.com/jackc/pgx/v4/stdlib"
+	"github.com/pressly/goose/v3"
 )
 
 func main() {
@@ -22,6 +25,16 @@ func main() {
 		log.Fatal(err)
 	}
 	defer dbPool.GetPool().Close()
+
+	sqlDB, err := sql.Open("pgx", db.GenerateDsn())
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer sqlDB.Close()
+
+	if err := goose.Up(sqlDB, "internal/storage/db/migrations"); err != nil {
+		log.Fatal(err)
+	}
 
 	storage := postgresql.NewWalletStorage(dbPool)
 	walletService := service.New(storage)
