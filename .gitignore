@@ -1,0 +1,7 @@
+WalletService
+*.exe
+*.out
+coverage
+coverage.out
+.idea/
+*.log

@@ -1,0 +1,27 @@
+services:
+  postgres:
+    image: postgres:latest
+    environment:
+      POSTGRES_DB: wallet-db
+      POSTGRES_USER: wallet-user
+      POSTGRES_PASSWORD: wallet-password
+    ports:
+      - "5432:5432"
+
+  app:
+    build: .
+    depends_on:
+      - postgres
+    env_file:
+      - ./config.env
+    ports:
+      - "8080:8080"
+
+  postgres-test:
+    image: postgres:latest
+    environment:
+      POSTGRES_DB: wallet-db-test
+      POSTGRES_USER: wallet-user
+      POSTGRES_PASSWORD: wallet-password
+    ports:
+      - "5433:5432"
