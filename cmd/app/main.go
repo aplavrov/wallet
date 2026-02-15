@@ -7,6 +7,7 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 
 	"github.com/aplavrov/wallet/internal/server"
 	"github.com/aplavrov/wallet/internal/service"
@@ -31,6 +32,14 @@ func main() {
 		log.Fatal(err)
 	}
 	defer sqlDB.Close()
+
+	for i := 0; i < 10; i++ {
+		if err := sqlDB.Ping(); err == nil {
+			break
+		}
+		log.Println("Waiting for PostgreSQL...")
+		time.Sleep(2 * time.Second)
+	}
 
 	if err := goose.Up(sqlDB, "internal/storage/db/migrations"); err != nil {
 		log.Fatal(err)
